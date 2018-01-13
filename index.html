@@ -56,7 +56,8 @@
 				if (e.which == 39) PosX += VX;
 
 				if (e.which == 38) { PosY -= VY; if (PosY <= 0) PosY = 0; }
-				if (e.which == 40) { PosY += VY; if ( PosY >= screen.height - $('nave').height() ) PosY = screen.height() - $('nave').height(); }
+				//if (e.which == 40) { console.log(PosY); PosY += VY; if ( PosY >= screen.height - $('nave').height() ) PosY = screen.height() - $('nave').height(); }
+				if (e.which == 40) { console.log(PosY); PosY += VY; if ( PosY >= 850 ) PosY = 850; }
 
 				if (e.which == 32)
 				{
@@ -89,7 +90,7 @@
 
 		if ($(Buffer).length)
 		{
-			console.log("Hey");
+			//console.log("Hey");
 
 			XL = $('#Laser_' + CLaser).offset().left;
 			WL = $('#Laser_' + CLaser).width();
@@ -182,10 +183,10 @@
 			var Y = Aleatorio(screen.height - 200);
 
 			InstanciarEnemigo(X, Y, EnemigoActual);
-			console.log(EnemigoActual);
+			//console.log(EnemigoActual);
 		}
 
-		setTimeout(EnemigosAleatorios, 1000);
+		setTimeout(EnemigosAleatorios, 500);
 	}
 
 
@@ -216,7 +217,7 @@
 								{
 									for (E = 0; E <= RangoEnemigos; E++)
 									{
-										console.log("Mirando enemigo "+ E);
+										//console.log("Mirando enemigo "+ E);
 
 										if ( Colisiona(this, "Alien_" + E, CLaser) )
 										{
