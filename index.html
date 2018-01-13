@@ -1,0 +1,259 @@
+<html>
+<head>
+	<title>Granoid</title>
+		<script type="text/javascript" src="includes/jquery/jquery-2.1.4.min.js"></script>
+		<link href="includes/style.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript">
+			var PosX = 200;
+			var PosY = 100;
+			var VX = 10;
+			var VY = 10;
+			var CLaser = 0;
+			var Fondo = 0;
+			var AudioLaser = document.createElement('audio');
+			AudioLaser.setAttribute('src', 'includes/sonidos/laser.mp3');
+
+			var AudioExp = document.createElement('audio');
+			AudioExp.setAttribute('src', 'includes/sonidos/explosion.mp3');
+			
+			function PlayLaser()
+			{
+				AudioLaser.play();
+			}
+
+			function PlayExplosion()
+			{
+				AudioExp.play();
+			}
+
+
+			function Aleatorio(Max)
+			{
+				Valor = Math.floor((Math.random() * Max));
+				return Valor;
+			}
+			
+			function MoverEnemigo(Sprite)
+			{
+				X = Aleatorio(50);
+				Y = Aleatorio(50);
+				
+				Sprite = "enemigo1";
+				$('#' + Sprite).animate({
+					left: "+=" + X, top: "+=" + Y
+				}, 300);
+				
+				setTimeout(MoverEnemigo, 350);
+			}
+	
+			function Destruir(CLaser)
+			{
+				$('#Laser_'+ CLaser).remove();	
+			}
+			
+			$(document).bind('keydown',function(e)
+			{
+				if (e.which == 37) { PosX -= VX; if (PosX <= 0) PosX = 0; }
+				if (e.which == 39) PosX += VX;
+
+				if (e.which == 38) { PosY -= VY; if (PosY <= 0) PosY = 0; }
+				if (e.which == 40) { PosY += VY; if ( PosY >= screen.height - $('nave').height() ) PosY = screen.height() - $('nave').height(); }
+				
+				if (e.which == 32)
+				{
+					CLaser = Disparar(CLaser);
+					console.log("Disparando: " + CLaser);
+				}
+
+				$('#nave').css({top: PosY, left: PosX, position:'absolute'});
+
+			});
+		</script>
+</head>
+<body style="scroll: none" class="fondo" id="Pantalla">
+	<div id="contenedor">
+		<div id="marcador" style="text-align: right; color: #FFFFFF; font-family: verdana; font-size: 14px; font-weight: bold;">Marcador: 0</div>
+		<img src="includes/sprites/vicviper.png" id="nave" />
+		<!--<img src="includes/sprites/enemigo1.png" id="enemigo1" />-->
+	</div>
+</body>
+</html>
+<script>
+	
+	function Detectar(CLaser, Enemigo)
+	{
+		XL = 0;
+		WL = 0;
+		Buffer = 'Laser_' + CLaser;
+		
+		//console.log(Buffer + ": " +$(Buffer).css.left);
+		
+		if ($(Buffer).length) 
+		{ 
+			console.log("Hey");
+			
+			XL = $('#Laser_' + CLaser).offset().left;
+			WL = $('#Laser_' + CLaser).width();
+		}
+		
+		XE = $('#enemigo1' + Enemigo).offset().left;
+		WE = $('#enemigo1' + Enemigo).width();
+		
+	}
+	
+	function Colisiona(Actual, Enemigo, C)
+	{
+		if (!$("#" + Enemigo).length) return;
+		
+		LEX = $(Actual).offset().left;
+		LSX = LEX + $(Actual).width();
+		
+		ESX = $("#" + Enemigo).offset().left;
+		EEX = ESX + $("#" + Enemigo).width();
+				
+		LSY = $(Actual).offset().top;
+		LEY = LSY + $(Actual).height();
+		ESY = $("#" + Enemigo).offset().top;
+		EEY = ESY + $("#" + Enemigo).height();
+
+		if ( (LSX >= ESX && LEX <= EEX) && (LSY >= ESY && LEY <= EEY) )
+		{
+			var Exp = $('<img />', {'src': 'includes/sprites/explosion.png', 'style': 'top: '+LSY+'; left: '+LSX,'class' : 'explosion', 'id': 'Exp_' + C});
+			$('#Exp_'+ C).css({left: LSX, top: LSY - 55, position:'absolute'});
+			$('BODY').append(Exp);
+			$('#Exp_'+ C).fadeOut("fast", function() { $('#Exp_'+ C).remove() });
+			console.log("Fire: "+LSX + " - "+LSY);
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
+	function PonerEnemigos()
+	{
+		var Enemigos = 0;
+		
+		var Total = TotalEnemigos;
+		for (i = 1; i < Total; i++)
+		{
+			var X = screen.width - 400;
+			var Y = i * (screen.height - 200) / Total;
+			
+			InstanciarEnemigo(X, Y, i);
+		}
+	}
+		
+	function GameOver()
+	{
+		$('#Pantalla').html("Game Over<br />Total puntos: " + Marcador);
+	}
+	
+	function InstanciarEnemigo(X, Y, i)
+	{
+		$('#Alien_' + i).remove(); 
+		var Alien = $('<img />', {'src': 'includes/sprites/e1.png', 'class' : 'e1', 'id': 'Alien_' + i});
+		$('BODY').append(Alien);
+			
+		$('#Alien_'+ i).css({top: Y, left: X, position:'absolute'});
+		
+		$('#Alien_'+ i).fadeIn(2000, function() 
+			{
+				$('#Alien_'+ i).animate({left: "-=1900"},  
+				{ duration: 5000, step: 
+					function( now, fx ) 
+					{ 
+						if (Colisiona(this, "nave", 100 + i))
+						{
+							GameOver();
+						}
+					}
+				} );
+			}
+		);
+	}
+
+	function EnemigosAleatorios()
+	{
+		EnemigoActual++;
+		
+		if (EnemigoActual > RangoEnemigos) EnemigoActual = 0;
+		{
+			var X = screen.width - 400;
+			var Y = Aleatorio(screen.height - 200);
+			
+			InstanciarEnemigo(X, Y, EnemigoActual);
+			console.log(EnemigoActual);
+		}
+		
+		setTimeout(EnemigosAleatorios, 1000);
+	}
+
+	
+	function MoverFondo()
+	{
+		/*Fondo--;
+		$('.fondo').css("background-position", "" + Fondo + "px 0px");
+		
+		for (CLaser = 0; CLaser <= 32; CLaser++) Detectar(CLaser, "");
+		
+		setTimeout(MoverFondo, 200);*/
+	}
+	
+	function Disparar(CLaser)
+	{
+		var PosX = $('#nave').offset().left;
+		var PosY = $('#nave').offset().top;
+		
+		$('#Laser_' + CLaser).remove(); 
+		var Laser1 = $('<div/>', {'class' : 'laser', 'id': 'Laser_' + CLaser});
+		$('BODY').append(Laser1);
+
+		$('#Laser_'+ CLaser).css({top: PosY + 40, left: PosX + 130, position:'absolute', visibility: 'visible'});
+		Total = screen.width - PosX - 140 - $('#Laser_'+ CLaser).width();
+		$('#Laser_'+ CLaser).animate( 
+		{left:"+=" + Total }, 
+		{ duration: 1000, step: function( now, fx ) 
+								{ 
+									for (E = 0; E <= RangoEnemigos; E++) 
+									{ 
+										console.log("Mirando enemigo "+ E);
+										
+										if ( Colisiona(this, "Alien_" + E, CLaser) )
+										{
+											Marcador += 100;
+											$("#marcador").html("Marcador: " + Marcador);
+											PlayExplosion();
+											$("#Alien_" + E).fadeOut("fast", function() { $("#Alien_" + E).hide(); } );
+											$("#Alien_" + E).remove();
+											$(this).remove();
+										}
+									}
+								}, 
+							complete: function() 
+								{ 
+									$(this).remove(); 
+								} 
+		} 
+		);
+	
+		CLaser++;
+		if (CLaser >= 32) { CLaser = 0; }
+		
+		PlayLaser();
+		
+		return CLaser;
+	}
+		
+	var Marcador = 0;
+	var CLaser = 0;
+	var TotalEnemigos = 10;
+	var EnemigoActual = TotalEnemigos;
+	var RangoEnemigos = 12;
+	
+	//setTimeout(MoverEnemigo, 350);
+	/*setTimeout(MoverFondo, 100);*/
+	setTimeout(PonerEnemigos, 2000);
+	setTimeout(EnemigosAleatorios, 10000);
+
+</script>

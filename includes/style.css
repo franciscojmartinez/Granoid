@@ -1,0 +1,63 @@
+BODY
+{
+	background-color: #000000
+}
+
+#nave
+{
+	position: absolute;
+	top: 100;
+	left: 200;
+	width: 199px; 
+	height: 99px;
+	overflow: hidden;
+	border: 0px;	
+}
+
+#enemigo1
+{
+	position: absolute;
+	top: 300;
+	left: 1000;
+	width: 735px; 
+	height: 242px;
+	overflow: hidden;
+	border: 0px;
+}
+
+.e1
+{
+	position: absolute;
+	overflow: hidden;
+	border: 0px;
+}
+
+.e2
+{
+	position: absolute;
+	overflow: hidden;
+	border: 0px;
+}
+
+.laser
+{
+	position: absolute;
+	top: 100;
+	left: 100;
+	width: 250px;
+	height: 5px;
+	background-color: #E0D174;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+}
+
+.explosion 
+{
+	position: absolute;
+}
+
+.fondo
+{
+	background: url(fondos/fondo1.jpg) no-repeat #000000;
+}
