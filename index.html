@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>Granoid 2.0</title>
+	<title>Granoid 3.0</title>
 		<script type="text/javascript" src="includes/jquery/jquery-2.1.4.min.js"></script>
 		<link href="includes/style.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript">
@@ -11,10 +11,16 @@
 			var CLaser = 0;
 			var Fondo = 0;
 			var AudioLaser = document.createElement('audio');
+			var Refrescar = false;
+			
 			AudioLaser.setAttribute('src', 'includes/sonidos/laser.mp3');
 
 			var AudioExp = document.createElement('audio');
 			AudioExp.setAttribute('src', 'includes/sonidos/explosion.mp3');
+
+			var keysDown = {};
+			addEventListener("keydown", function (e) { keysDown[e.keyCode] = true; }, false);
+			addEventListener("keyup", function (e) { delete keysDown[e.keyCode]; }, false);
 
 			function PlayLaser()
 			{
@@ -50,24 +56,23 @@
 				$('#Laser_'+ CLaser).remove();
 			}
 
-			$(document).bind('keydown',function(e)
+			Refrescar = false;
+			if (38 in keysDown) { PosY -= VY; if (PosY <= 0) PosY = 0; Refrescar = true; }
+			if (40 in keysDown) { hero.y += hero.speed * modifier; Refrescar = true; }
+			if (37 in keysDown) { PosX -= VX; if (PosX <= 0) PosX = 0; Refrescar = true; }
+			if (39 in keysDown) { PosX += VX; Refrescar = true; }
+			if (32 in keysDown)
 			{
-				if (e.which == 37) { PosX -= VX; if (PosX <= 0) PosX = 0; }
-				if (e.which == 39) PosX += VX;
+				CLaser = Disparar(CLaser);
+				console.log("Disparando: " + CLaser);
+			}
 
-				if (e.which == 38) { PosY -= VY; if (PosY <= 0) PosY = 0; }
-				//if (e.which == 40) { console.log(PosY); PosY += VY; if ( PosY >= screen.height - $('nave').height() ) PosY = screen.height() - $('nave').height(); }
-				if (e.which == 40) { console.log(PosY); PosY += VY; if ( PosY >= 850 ) PosY = 850; }
-
-				if (e.which == 32)
-				{
-					CLaser = Disparar(CLaser);
-					console.log("Disparando: " + CLaser);
-				}
-
+			if (Refrescar)
+			{
 				$('#nave').css({top: PosY, left: PosX, position:'absolute'});
-
-			});
+				Refrescar = false;
+			}
+			
 		</script>
 </head>
 <body style="scroll: none" class="fondo" id="Pantalla">
